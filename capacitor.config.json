@@ -1,0 +1,13 @@
+{
+  "appId": "com.zak.calendrier",
+  "appName": "Shift calendar by zak",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "CapacitorHttp": {
+      "enabled": true
+    }
+  }
+}
