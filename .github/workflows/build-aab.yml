@@ -44,6 +44,9 @@ jobs:
           chmod +x scripts/android-setup.sh
           bash scripts/android-setup.sh
 
+      - name: Set version code
+        run: sed -i "s/versionCode 1/versionCode $GITHUB_RUN_NUMBER/" android/app/build.gradle
+
       - name: Read keystore credentials
         run: |
           echo "KEYSTORE_FILE=$GITHUB_WORKSPACE/calendrier-release.keystore" >> "$GITHUB_ENV"
