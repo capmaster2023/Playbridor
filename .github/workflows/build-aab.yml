@@ -1,0 +1,62 @@
+name: Build AAB
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Add Android platform
+        run: npx cap add android
+
+      - name: Sync Capacitor
+        run: npx cap sync android
+
+      - name: Apply Android setup
+        run: |
+          chmod +x scripts/android-setup.sh
+          bash scripts/android-setup.sh
+
+      - name: Read keystore credentials
+        run: |
+          echo "KEYSTORE_FILE=$GITHUB_WORKSPACE/calendrier-release.keystore" >> "$GITHUB_ENV"
+          echo "KEY_ALIAS=calendrier" >> "$GITHUB_ENV"
+          echo "KEYSTORE_PASSWORD=$(grep -i storepass KEYSTORE-SECRETS.txt | head -1 | sed -E 's/^[^[:space:]=:]*[[:space:]=:]+//')" >> "$GITHUB_ENV"
+          echo "KEY_PASSWORD=$(grep -i keypass KEYSTORE-SECRETS.txt | head -1 | sed -E 's/^[^[:space:]=:]*[[:space:]=:]+//')" >> "$GITHUB_ENV"
+
+      - name: Build signed AAB + APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew bundleRelease assembleRelease
+
+      - name: Upload AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: shift-calendar-aab
+          path: android/app/build/outputs/bundle/release/*.aab
+          if-no-files-found: error
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: shift-calendar-apk
+          path: android/app/build/outputs/apk/release/*.apk
+          if-no-files-found: error
