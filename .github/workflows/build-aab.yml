@@ -26,8 +26,15 @@ jobs:
       - name: Add Android platform
         run: npx cap add android
 
-      - name: Bump minSdkVersion to 24
-        run: sed -i 's/minSdkVersion = 23/minSdkVersion = 24/' android/variables.gradle
+      - name: Set SDK versions for Play
+        run: |
+          sed -i 's/minSdkVersion = 23/minSdkVersion = 24/' android/variables.gradle
+          sed -i 's/compileSdkVersion = 35/compileSdkVersion = 36/' android/variables.gradle
+          sed -i 's/targetSdkVersion = 35/targetSdkVersion = 36/' android/variables.gradle
+          echo "android.suppressUnsupportedCompileSdk=36" >> android/gradle.properties
+
+      - name: Install Android SDK 36
+        run: yes | sdkmanager "platforms;android-36" "build-tools;36.0.0" || true
 
       - name: Sync Capacitor
         run: npx cap sync android
