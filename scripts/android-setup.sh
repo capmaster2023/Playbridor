@@ -10,7 +10,7 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 APP="$ROOT/android/app"
 MAIN="$APP/src/main"
 RES="$MAIN/res"
-APP_ID="com.zak.calendrier"
+APP_ID="com.graceofgod.shiftcalendar"
 APP_LABEL="Shift calendar by zak"
 
 echo "==> android-setup : $APP_ID"
